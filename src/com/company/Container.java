@@ -51,7 +51,8 @@ public class Container implements ApplicationContext{
                 // we have two cases, interface and class, because interface may have multiple implementation,
                 // which is trickier
 
-                // 1. interface
+                // 1. interface, we have to make sure there aren't multiple impl, if it has multiple impl,
+                // clients have to use qualifier annotation for providing exact impl.
                 if (type.isInterface()) {
                     if (interface2impl.get(type).size() > 1 && field.isAnnotationPresent(Qualifier.class)){
                         String name = field.getAnnotation(Qualifier.class).value();
@@ -73,6 +74,8 @@ public class Container implements ApplicationContext{
                 field.setAccessible(true);
                 field.set(object, dependency);
             }
+            // this else clause is for ordinary values injection such as String, Integer etc.
+            // for now we only provide String & Integer types injection
             else {
                 Value value = field.getAnnotation(Value.class);
                 if (value != null) {
@@ -105,11 +108,12 @@ public class Container implements ApplicationContext{
         return name2obj.get(className);
     }
 
-    // adjust manually
+    // currently we have to add class manually, automatically scan is not yet implemented
     private List<Class<?>> getComponentClasses() {
         List<Class<?>> classes = Arrays.asList(Person.class, Address.class, Engineer.class,
                 Sales.class, Manager.class);
 
+        // scan and keep record of interface and its implementations
         for (Class<?> implementation : classes) {
             if (implementation.isInterface()) continue;
             Class<?>[] interfaces = implementation.getInterfaces();
@@ -118,7 +122,6 @@ public class Container implements ApplicationContext{
                 interface2impl.get(interfaceClass).add(implementation);
             }
         }
-//        class2count.put(JobType.class, 3);
 
         return classes;
     }
