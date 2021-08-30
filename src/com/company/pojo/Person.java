@@ -17,7 +17,7 @@ public class Person {
     Address addr;
 
     @Autowired
-    @Qualifier("com.company.pojo.Engineer")
+    @Qualifier("com.company.pojo.Manager")
     JobType job;
 
     public Person() {

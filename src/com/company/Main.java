@@ -10,9 +10,9 @@ public class Main {
     public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException {
 	// write your code here
         ApplicationContext context = new Container();
-        Person obj = context.getBean(Person.class);
-        obj.Work();
+        Person bean = context.getBean(Person.class);
+        bean.Work();
 
-        System.out.println(obj);
+        System.out.println(bean);
     }
 }

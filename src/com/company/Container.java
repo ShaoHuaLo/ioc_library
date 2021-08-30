@@ -8,16 +8,13 @@ import com.company.pojo.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Container implements ApplicationContext{
     private Map<String, Object> name2obj;
     private Map<Class<?>, Object> class2obj;
     private Map<Class<?>, Integer> class2count;
-    private Map<Class<?>, Class<?>> interface2impl;
+    private Map<Class<?>, List<Class<?>>> interface2impl;
 
     public Container() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ClassNotFoundException {
         name2obj = new HashMap<>();
@@ -43,27 +40,32 @@ public class Container implements ApplicationContext{
 
         Constructor<?> constructor = clazz.getConstructor(null);
         Object object = constructor.newInstance();
+        // inject dependency(field) one by one
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             Autowired autowired = field.getAnnotation(Autowired.class);
+            // if the field is a dependency, inject recursively
             if (autowired != null) {
                 Object dependency = null;
                 Class<?> type = field.getType();
-                // interface
+                // we have two cases, interface and class, because interface may have multiple implementation,
+                // which is trickier
+
+                // 1. interface
                 if (type.isInterface()) {
-                    if (class2count.get(type) > 1 && field.isAnnotationPresent(Qualifier.class)){
+                    if (interface2impl.get(type).size() > 1 && field.isAnnotationPresent(Qualifier.class)){
                         String name = field.getAnnotation(Qualifier.class).value();
                         dependency = name2obj.get(name) == null ? createBean(name) : name2obj.get(name);
                     }
-                    else if (class2count.get(type) == 1) {
-                        Class<?> implementation = interface2impl.get(type);
+                    else if (interface2impl.get(type).size() == 1) {
+                        Class<?> implementation = interface2impl.get(type).get(0);
                         dependency = class2obj.get(implementation) == null ? createBean(implementation) : class2obj.get(implementation);
                     }
                     else {
                         throw new RuntimeException("more than 1 implementation and no qualifier used");
                     }
                 }
-                // class
+                // 2. class
                 else {
                     dependency = class2obj.get(type) == null ? createBean(type) : class2obj.get(type);
                 }
@@ -105,8 +107,20 @@ public class Container implements ApplicationContext{
 
     // adjust manually
     private List<Class<?>> getComponentClasses() {
-        class2count.put(JobType.class, 3);
-        return Arrays.asList(Person.class, Address.class, Engineer.class, Sales.class, Manager.class);
+        List<Class<?>> classes = Arrays.asList(Person.class, Address.class, Engineer.class,
+                Sales.class, Manager.class);
+
+        for (Class<?> implementation : classes) {
+            if (implementation.isInterface()) continue;
+            Class<?>[] interfaces = implementation.getInterfaces();
+            for (Class<?> interfaceClass : interfaces) {
+                interface2impl.putIfAbsent(interfaceClass, new ArrayList<>());
+                interface2impl.get(interfaceClass).add(implementation);
+            }
+        }
+//        class2count.put(JobType.class, 3);
+
+        return classes;
     }
 
 }
