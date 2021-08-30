@@ -1,8 +1,11 @@
 package com.company.pojo;
 
 import com.company.annotation.Autowired;
+import com.company.annotation.Component;
+import com.company.annotation.Qualifier;
 import com.company.annotation.Value;
 
+@Component
 public class Person {
     @Value("willy")
     String name;
@@ -13,6 +16,10 @@ public class Person {
     @Autowired
     Address addr;
 
+    @Autowired
+    @Qualifier("com.company.pojo.Engineer")
+    JobType job;
+
     public Person() {
     }
 
@@ -20,6 +27,10 @@ public class Person {
         this.name = name;
         this.age = age;
         this.addr = addr;
+    }
+
+    public void Work() {
+        this.job.work();
     }
 
     @Override

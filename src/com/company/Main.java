@@ -1,9 +1,9 @@
 package com.company;
 
+import com.company.pojo.JobType;
 import com.company.pojo.Person;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 
 public class Main {
 
@@ -11,6 +11,8 @@ public class Main {
 	// write your code here
         ApplicationContext context = new Container();
         Person obj = context.getBean(Person.class);
+        obj.Work();
+
         System.out.println(obj);
     }
 }

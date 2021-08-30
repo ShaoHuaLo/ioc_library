@@ -3,8 +3,7 @@ package com.company;
 import com.company.annotation.Autowired;
 import com.company.annotation.Qualifier;
 import com.company.annotation.Value;
-import com.company.pojo.Address;
-import com.company.pojo.Person;
+import com.company.pojo.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -52,8 +51,8 @@ public class Container implements ApplicationContext{
                 Class<?> type = field.getType();
                 // interface
                 if (type.isInterface()) {
-                    if (class2count.get(type) > 1 && type.isAnnotationPresent(Qualifier.class)){
-                        String name = type.getAnnotation(Qualifier.class).value();
+                    if (class2count.get(type) > 1 && field.isAnnotationPresent(Qualifier.class)){
+                        String name = field.getAnnotation(Qualifier.class).value();
                         dependency = name2obj.get(name) == null ? createBean(name) : name2obj.get(name);
                     }
                     else if (class2count.get(type) == 1) {
@@ -104,8 +103,10 @@ public class Container implements ApplicationContext{
         return name2obj.get(className);
     }
 
+    // adjust manually
     private List<Class<?>> getComponentClasses() {
-        return Arrays.asList(Person.class, Address.class);
+        class2count.put(JobType.class, 3);
+        return Arrays.asList(Person.class, Address.class, Engineer.class, Sales.class, Manager.class);
     }
 
 }
