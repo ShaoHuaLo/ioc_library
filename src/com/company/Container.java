@@ -12,13 +12,11 @@ import java.util.*;
 public class Container implements ApplicationContext{
     private Map<String, Object> name2obj;
     private Map<Class<?>, Object> class2obj;
-//    private Map<Class<?>, Integer> class2count;
     private Map<Class<?>, List<Class<?>>> interface2impl;
 
     public Container() throws Throwable {
         name2obj = new HashMap<>();
         class2obj = new HashMap<>();
-//        class2count = new HashMap<>();
         interface2impl = new HashMap<>();
 
         List<Class<?>> classes = getComponentClasses();
