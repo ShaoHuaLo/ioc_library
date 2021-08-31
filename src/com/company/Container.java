@@ -7,19 +7,18 @@ import com.company.pojo.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class Container implements ApplicationContext{
     private Map<String, Object> name2obj;
     private Map<Class<?>, Object> class2obj;
-    private Map<Class<?>, Integer> class2count;
+//    private Map<Class<?>, Integer> class2count;
     private Map<Class<?>, List<Class<?>>> interface2impl;
 
-    public Container() throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    public Container() throws Throwable {
         name2obj = new HashMap<>();
         class2obj = new HashMap<>();
-        class2count = new HashMap<>();
+//        class2count = new HashMap<>();
         interface2impl = new HashMap<>();
 
         List<Class<?>> classes = getComponentClasses();
@@ -28,12 +27,12 @@ public class Container implements ApplicationContext{
         }
     }
 
-    private Object createBean(String className) throws ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    private Object createBean(String className) throws Throwable {
         Class<?> aClass = Class.forName(className);
         return createBean(aClass);
     }
 
-    private Object createBean(Class<?> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, ClassNotFoundException {
+    private Object createBean(Class<?> clazz) throws Throwable {
         if (class2obj.containsKey(clazz)) {
             return class2obj.get(clazz);
         }

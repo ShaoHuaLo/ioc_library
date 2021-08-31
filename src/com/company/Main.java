@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class Main {
 
-    public static void main(String[] args) throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws Throwable {
 	// write your code here
         ApplicationContext context = new Container();
         Person bean = context.getBean(Person.class);
